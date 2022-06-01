@@ -1,0 +1,49 @@
+version: "3.9"
+services:
+  postgres:
+    image: postgres:alpine
+    container_name: postgres
+    restart: always
+    ports:
+      - "${POSTGRES_PORT}:${POSTGRES_PORT}"
+    env_file:
+      - .env
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U postgres"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  prisma-studio:
+    container_name: prisma-studio
+    image: timothyjmiller/prisma-studio:latest
+    restart: unless-stopped
+    env_file:
+     - .env
+    ports:
+      - ${PRISMA_STUDIO_PORT}:5555
+
+  api:
+    container_name: api
+    build:
+      dockerfile: Dockerfile
+      target: dev
+      context: ./
+    volumes:
+      - /app/node_modules
+      - .:/app
+    restart: on-failure
+    command: npm run dev
+    links:
+      - postgres
+    ports:
+      - "${API_NODE_PORT}:${API_NODE_PORT}"
+    depends_on:
+      - postgres
+    environment:
+      - POSTGRES_USERNAME
+      - POSTGRES_PASSWORD
+      - NODE_ENV
+
+volumes:
+  postgres: ~

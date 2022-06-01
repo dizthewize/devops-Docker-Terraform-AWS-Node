@@ -14,7 +14,7 @@ import errorHandler from './middlewares/errorHandler';
 
 const app: Application = express();
 
-const port: string | number = process.env.PORT || 4000;
+const port: string | number = process.env.PORT || process.env.API_NODE_PORT || 4000;
 
 app.use(morgan('common'));
 app.use(helmet());
@@ -25,12 +25,12 @@ app.use(
   }),
 );
 app.use(express.json());
-app.use(express.urlencoded());
+app.use(express.urlencoded({ extended: true }));
 app.use(cookieParser());
 app.use(session({ name: 'jwt', keys: ['abc'] }));
 
-app.use('/api/auth', authRoutes);
-app.use('/api/user', userRoute);
+// app.use('/api/auth', authRoutes);
+// app.use('/api/user', userRoute);
 
 app.get(`/*`, (req: Request, res: Response) =>
   res.json({
