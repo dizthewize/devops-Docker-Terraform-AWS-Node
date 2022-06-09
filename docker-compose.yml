@@ -26,24 +26,20 @@ services:
   api:
     container_name: api
     build:
-      dockerfile: Dockerfile
+      context: ./api
+      dockerfile: dockerfile
       target: dev
-      context: ./
+      args:
+        - NODE_ENV=${NODE_ENV}
     volumes:
-      - /app/node_modules
-      - .:/app
-    restart: on-failure
+      - ./api/src:/app/src
     command: npm run dev
-    links:
-      - postgres
     ports:
       - "${API_NODE_PORT}:${API_NODE_PORT}"
-    depends_on:
-      - postgres
     environment:
       - POSTGRES_USERNAME
       - POSTGRES_PASSWORD
       - NODE_ENV
 
 volumes:
-  postgres: ~
+  postgres: {}

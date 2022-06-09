@@ -7,8 +7,8 @@ import helmet from 'helmet';
 import cors from 'cors';
 import cookieParser from 'cookie-parser';
 import session from 'cookie-session';
-import notFound from './middlewares/notFound';
-import errorHandler from './middlewares/errorHandler';
+import notFound from './utils/middlewares/notFound';
+import errorHandler from './utils/middlewares/errorHandler';
 
 const app: Application = express();
 

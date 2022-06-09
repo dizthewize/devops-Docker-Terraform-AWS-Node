@@ -1,32 +1,35 @@
-FROM alpine:3.14 AS base
+FROM node:16.15.1-alpine3.16 AS base
 WORKDIR /app
 # A wildcard is used to ensure both package.json AND package-lock.json are copied
-COPY package*.json ./
-COPY tsconfig.json ./
+COPY ./package*.json ./
+COPY ./tsconfig.json ./
 
 # ---- Development ----
 FROM base AS dev
-ENV NODE_ENV development
+ARG NODE_ENV
+ENV NODE_ENV ${NODE_ENV}
 
+RUN npm install -g nodemon
 RUN npm install
+# RUN npm ci && npm cache clean --force
 COPY . .
 USER node
-CMD ["npm", "dev"]
+CMD npm run dev
 
 # ---- Copy Files/Build ----
 FROM base AS builder
-COPY ./src ./src
+COPY . .
 # Build react/vue/angular bundle static files
 USER node
 RUN npm run build
 
 # ---- Production ----
 FROM base AS production
-ENV NODE_ENV production
-# optional
-# RUN npm -g install serve
-# Install app dependencies
+ARG NODE_ENV
+ENV NODE_ENV ${NODE_ENV}
+# optional *install app dependencies*
+# RUN npm install pm2 -g
 RUN npm install --only=production
 COPY --from=builder /app/dist ./dist
 USER node
-CMD ["node", "dist/index.js"]
+CMD node dist/index.js
