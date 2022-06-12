@@ -1,3 +1,13 @@
 node_modules
 # Keep environment variables out of version control
 .env
+
+# local .terraform dir
+.terraform/*
+
+# tf state files
+*.tfstate
+*.tfstate.*
+
+# tf variable files, may include sensitive data
+*.tfvars
